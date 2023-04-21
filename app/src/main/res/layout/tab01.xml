@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <TextView
+        android:id="@+id/tvAddItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Items"
+        android:textSize="20sp"
+        android:layout_margin="@dimen/text20"
+        android:textColor="@color/colorAccentBlue"
+        android:gravity="center"/>
+    <TextView
+        android:id="@+id/input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_confirm"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:layout_margin="@dimen/text10"
+        android:background="@color/colorAccentBlue"
+        android:padding="12dp"
+        android:text="Submit"/>
+</LinearLayout>
