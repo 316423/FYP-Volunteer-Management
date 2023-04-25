@@ -6,16 +6,26 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
-      <android.widget.SearchView
-          android:id="@+id/searchview"
-          android:layout_width="match_parent"
-          android:layout_height="30dp"
-          android:focusable="false"
-          android:focusableInTouchMode="false"
-          android:textColor="#000000"
-          app:iconifiedByDefault="false"
-          app:queryHint="search" />
-      <LinearLayout
+    <ImageView
+        android:id="@+id/btn_ok"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/ic_menu"/>
+
+    <android.widget.SearchView
+        android:id="@+id/searchview"
+        android:layout_width="match_parent"
+        android:layout_toLeftOf="@id/btn_ok"
+        android:layout_height="50dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:textColor="#000000"
+        app:iconifiedByDefault="false"
+        app:queryHint="search" />
+
+
+    <LinearLayout
           android:id="@+id/ll"
           android:layout_below="@+id/searchview"
           android:layout_width="match_parent"
@@ -74,22 +84,7 @@
               android:layout_height="match_parent"
               android:layout_marginBottom="50dp" />
       </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-      <LinearLayout
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal"
-          android:layout_alignParentBottom="true"
-          >
 
-          <Button
-              android:id="@+id/btn_ok"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:layout_weight="1"
-              android:layout_marginLeft="10dp"
-              android:layout_marginRight="10dp"
-              android:background="@color/colorPrimary"
-              android:text="Add Event" />
 
-      </LinearLayout>
+
   </RelativeLayout>

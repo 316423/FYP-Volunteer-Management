@@ -3,14 +3,13 @@ package com.demo.PocketStore
 import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.EditText
-import androidx.appcompat.widget.AppCompatButton
-import android.widget.TextView
-import com.demo.PocketStore.UserDataManager
 import android.os.Bundle
-import com.demo.PocketStore.R
-import android.widget.Toast
 import android.content.Intent
-import com.demo.PocketStore.SigninActivity
+import android.widget.Toast
+import android.widget.TextView
+import com.demo.PocketStore.db.manager.UserDataManager
+import androidx.appcompat.widget.AppCompatButton
+import com.demo.PocketStore.db.bean.*
 
 class SignupActivity : AppCompatActivity(), View.OnClickListener {
     //@BindView(R.id.input_name)
@@ -25,7 +24,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
     var _reEnterPasswordText: EditText? = null
     var _signupButton: AppCompatButton? = null
     var _linkSignin: TextView? = null
-    private var mUserDataManager //the class for user's data management
+    private var mUserDataManager //用户数据管理类
             : UserDataManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,14 +46,14 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun signup() {
-        //determine whether it is valid or not
+        //判断是否合法
         if (!validate()) {
             onSignupFailed(0)
             return
         }
         _signupButton!!.isEnabled = false
 
-        //get input data
+        //获取数据
         val username = _nameText!!.text.toString()
         val email = _emailText!!.text.toString()
         val phone = _phoneText!!.text.toString()
@@ -63,7 +62,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         val mUser = UserData(username, password, email, phone)
         if (mUserDataManager == null) {
             mUserDataManager = UserDataManager(this)
-            mUserDataManager!!.openDataBase() //open the database
+            mUserDataManager!!.openDataBase() //建立本地数据库
         }
         if (!mUserDataManager!!.checkUserDataValid(username, email)) {
             Toast.makeText(
@@ -72,7 +71,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
             ).show()
             return
         }
-        val flag = mUserDataManager!!.insertUserData(mUser) //the information of the register user
+        val flag = mUserDataManager!!.insertUserData(mUser) //注册用户信息
         if (flag == -1L) {
             Toast.makeText(applicationContext, "register failed...", Toast.LENGTH_SHORT).show()
         } else {
@@ -81,7 +80,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
                 "register successfully,please login!",
                 Toast.LENGTH_SHORT
             ).show()
-            //Toast.makeText(getApplicationContext(),"save file successfully", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),"文件保存成功", Toast.LENGTH_SHORT).show();
             val intent = Intent(this, SigninActivity::class.java)
             intent.putExtra("name", username)
             intent.putExtra("pwd", password)
@@ -91,8 +90,8 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     /**
-     * sign up failed, enabled the buttton
-     * different parameters run different toasts
+     * 注册失败，按钮置为可用
+     * 依据传参不同，进行不同吐司
      */
     fun onSignupFailed(i: Int) {
         if (i == 1) {
@@ -104,17 +103,17 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     /**
-     * @return input data is valid ot not
+     * @return 输入内容是否合法
      */
     fun validate(): Boolean {
         var valid = true
-        //    get data
+        //      从控件中获取数据
         val name = _nameText!!.text.toString()
         val email = _nameText!!.text.toString()
         val phone = _passwordText!!.text.toString()
         val password = _passwordText!!.text.toString()
         val reEnterPassword = _reEnterPasswordText!!.text.toString()
-        //determine the account is valid or not
+        //检测账号是否正确
         if (name.isEmpty()) {
             _nameText!!.error = "name is empty"
             valid = false
@@ -133,14 +132,14 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         } else {
             _phoneText!!.error = null
         }
-        //determine password
+        //检测密码是否正确
         if (password.isEmpty()) {
             _passwordText!!.error = "password is empty"
             valid = false
         } else {
             _passwordText!!.error = null
         }
-        //determine re-password
+        //检测重复密码是否正确
         if (reEnterPassword.isEmpty() || reEnterPassword != password) {
             _reEnterPasswordText!!.error = "password is different"
             valid = false
@@ -154,7 +153,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         when (view.id) {
             R.id.btn_signup -> signup()
             R.id.link_login -> {
-                //click login, switch to login page
+                //点击登录连接，跳转到登录页面
                 val intent = Intent(applicationContext, SigninActivity::class.java)
                 startActivity(intent)
                 finish()

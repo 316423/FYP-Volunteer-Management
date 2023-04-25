@@ -1,31 +1,37 @@
 package com.demo.PocketStore
 
-import android.app.Activity
-import android.content.Context
 import android.view.View
+import android.os.Bundle
+import android.view.Window
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.TextView
+import android.widget.ListView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout.OnRefreshListener
+import android.widget.AdapterView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager.widget.PagerAdapter
 import android.widget.LinearLayout
 import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.ListView
-import com.demo.PocketStore.UserDataManager
+import com.demo.PocketStore.db.manager.UserDataManager
 import android.widget.SimpleAdapter
-import android.os.Bundle
-import android.view.Window
-import com.demo.PocketStore.R
+import android.widget.RelativeLayout
+import com.demo.PocketStore.db.manager.RatingDataManager
+import com.demo.PocketStore.adapter.RatingListAdapter
 import androidx.viewpager.widget.ViewPager.OnPageChangeListener
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.demo.PocketStore.ManagerListAdapter
-import android.content.Intent
-import com.demo.PocketStore.HomeActivity
-import android.util.Log
-import android.widget.Toast
+import com.demo.PocketStore.adapter.ManagerListAdapter
+import com.demo.PocketStore.db.bean.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class HomeActivity : Activity(), View.OnClickListener {
+class HomeActivity : Activity(), View.OnClickListener, OnItemClickListener {
     private val REQUEST_CODE_1 = 1
     private val REQUEST_CODE_2 = 2
     private var mViewPager: ViewPager? = null
@@ -41,17 +47,24 @@ class HomeActivity : Activity(), View.OnClickListener {
     private var tvFrd: TextView? = null
     private var tvSetting: TextView? = null
     private var tvTopTitle: TextView? = null
-    private var tvInput: TextView? = null
     private val llNewFriend: LinearLayout? = null
     private val listView: ListView? = null
     private var listManager: ListView? = null
     private var mUserDataManager: UserDataManager? = null
-    private var userDataList: MutableList<UserData> = ArrayList()
+    private var userDataList: List<UserData> = ArrayList()
     private val mHashMap: HashMap<String, Any>? = null
     private val mSimpleAdapter: SimpleAdapter? = null
     var mContext: Context? = null
     private var username: String? = null
-    private var loanItems = 0
+    private val loanItems = 0
+    var l_issue_send: RelativeLayout? = null
+    var l_msg_send: LinearLayout? = null
+    var l_msg_rec: LinearLayout? = null
+    private var mDataManager: RatingDataManager? = null
+    private val dataList: MutableList<RatingData> = ArrayList()
+    var list: ListView? = null
+    var adapter2: RatingListAdapter? = null
+    private var swipe: SwipeRefreshLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -69,24 +82,24 @@ class HomeActivity : Activity(), View.OnClickListener {
         mTabSetting!!.setOnClickListener(this)
         //viewpager滑动事件
         mViewPager!!.setOnPageChangeListener(object : OnPageChangeListener {
-            override fun onPageSelected(arg0: Int) { //when the viewpager slides，the corresponding image of the bottom navigation button needs to be changed
+            override fun onPageSelected(arg0: Int) { //当viewpager滑动时，对应的底部导航按钮的图片要变化
                 val currentItem = mViewPager!!.currentItem
                 resetImg()
                 when (currentItem) {
                     0 -> {
                         mWeixinImg!!.setImageResource(R.drawable.tab_01_pressed)
                         tvWeixin!!.setTextColor(resources.getColor(R.color.colorAccentBlue))
-                        tvTopTitle!!.text = "New Loan"
+                        tvTopTitle!!.text = "Approval"
                     }
                     1 -> {
                         mFrdImg!!.setImageResource(R.drawable.tab_02_pressed)
                         tvFrd!!.setTextColor(resources.getColor(R.color.colorAccentBlue))
-                        tvTopTitle!!.text = "My Loans"
+                        tvTopTitle!!.text = "Message"
                     }
                     2 -> {
                         mSettingImg!!.setImageResource(R.drawable.tab_03_pressed)
                         tvSetting!!.setTextColor(resources.getColor(R.color.colorAccentBlue))
-                        tvTopTitle!!.text = "Manage"
+                        tvTopTitle!!.text = "Resolve"
                     }
                     else -> {}
                 }
@@ -102,7 +115,7 @@ class HomeActivity : Activity(), View.OnClickListener {
         })
     }
 
-    private fun initView() { //Initialise all view
+    private fun initView() { //init all view
         mViewPager = findViewById<View>(R.id.id_viewpager) as ViewPager
         //tabs
         mTabWeixin = findViewById<View>(R.id.id_tab_weixin) as LinearLayout
@@ -117,18 +130,15 @@ class HomeActivity : Activity(), View.OnClickListener {
         tvFrd = findViewById<View>(R.id.id_tab_frd_tv) as TextView
         tvSetting = findViewById<View>(R.id.id_tab_setting_tv) as TextView
         tvTopTitle = findViewById<View>(R.id.tv_top_title) as TextView
-
-        //Introducing layouts by LayoutInflater and converting them into views
-        val mInflater = LayoutInflater.from(this) //create an object of LayoutInflater
-        val tab01 = mInflater.inflate(R.layout.tab04, null) //Dynamically loading a layout file by inflate method
-        val tab02 = mInflater.inflate(R.layout.tab_friend, null)
-        val tab04 = mInflater.inflate(R.layout.tab_friend, null)
-        tvInput = tab04.findViewById(R.id.input)
+        val mInflater = LayoutInflater.from(this)
+        val tab01 = mInflater.inflate(R.layout.tab01, null)
+        val tab02 = mInflater.inflate(R.layout.tab02, null)
+        val tab03 = mInflater.inflate(R.layout.tab03, null)
         listManager = tab01.findViewById<View>(R.id.listManager) as ListView
         mViews.add(tab01)
         mViews.add(tab02)
-        mViews.add(tab04)
-        //Initialise PagerAdapter
+        mViews.add(tab03)
+        //init PagerAdapter
         mAdapter = object : PagerAdapter() {
             override fun destroyItem(
                 container: ViewGroup, position: Int,
@@ -139,8 +149,8 @@ class HomeActivity : Activity(), View.OnClickListener {
             }
 
             override fun instantiateItem(container: ViewGroup, position: Int): Any {
-                val view = mViews[position] // Get the needed view form the list of Views by position
-                container.addView(view) //add the above view into ViewGroup
+                val view = mViews[position]
+                container.addView(view)
                 return view
             }
 
@@ -150,58 +160,84 @@ class HomeActivity : Activity(), View.OnClickListener {
             }
 
             override fun getCount(): Int {
-                // return the size of views from PagerView
                 return mViews.size
             }
         }
-        //configure adapter for ViewPager
         mViewPager!!.adapter = mAdapter
+        l_issue_send = tab02.findViewById(R.id.l_issue_send)
+        l_issue_send?.setOnClickListener(this)
+        l_msg_send = tab02.findViewById(R.id.l_msg_send)
+        l_msg_send?.setOnClickListener(this)
+        l_msg_rec = tab02.findViewById(R.id.l_msg_rec)
+        l_msg_rec?.setOnClickListener(this)
+        list = tab03.findViewById(R.id.list)
+        list?.setOnItemClickListener(this)
+        swipe = tab03.findViewById(R.id.swipe)
+        swipe?.setColorSchemeColors(resources.getColor(R.color.red), resources.getColor(R.color.red))
+        //设置向下拉多少出现刷新
+        swipe?.setDistanceToTriggerSync(200)
+        //设置刷新出现的位置
+        swipe?.setProgressViewEndTarget(false, 200)
+        swipe?.setOnRefreshListener(OnRefreshListener {
+            swipe?.setRefreshing(false)
+            initData()
+        })
     }
 
-    //Initialisation
     private fun initData() {
         if (mUserDataManager == null) {
             mUserDataManager = UserDataManager(this)
-            mUserDataManager!!.openDataBase() //open local database
+            mUserDataManager!!.openDataBase() //建立本地数据库
         }
-        userDataList.clear()
+       // userDataList
         mUserDataManager!!.openDataBase()
-        userDataList = mUserDataManager!!.allUserDataList.toMutableList()
-        val adapter2 = mContext?.let { ManagerListAdapter(userDataList, it) }
-        listManager!!.adapter = adapter2
-        adapter2?.notifyDataSetChanged()
+        userDataList = mUserDataManager!!.allUserDataList
+        val adapter = ManagerListAdapter(userDataList, this)
+        listManager!!.adapter = adapter
+        adapter.notifyDataSetChanged()
+        if (mDataManager == null) {
+            mDataManager = RatingDataManager(this)
+            mDataManager!!.openDataBase()
+        }
+        dataList.clear()
+        val appDataList = mDataManager!!.allDataList
+        for (ratingData in appDataList) {
+            if (ratingData.rating <= 3) {
+                dataList.add(ratingData)
+            }
+        }
+        adapter2 = RatingListAdapter(dataList, this)
+        list!!.adapter = adapter2
+        adapter2!!.notifyDataSetChanged()
     }
 
     override fun onClick(v: View) {
-        resetImg() //when click tab, the corresponding color should be brighter,Therefore, before
-        // clicking on a specific tab, reset all images to an unchecked state, a dark images
-
+        resetImg() //
         when (v.id) {
             R.id.id_tab_weixin -> {
                 mViewPager!!.currentItem = 0
-                mWeixinImg!!.setImageResource(R.drawable.tab_01_pressed) //highlight the color of the button
-                tvWeixin!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //highlight the color of the button
-                tvTopTitle!!.text = "Organisation Approval"
+                mWeixinImg!!.setImageResource(R.drawable.tab_01_pressed) //并将按钮颜色点亮
+                tvWeixin!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //并将按钮颜色点亮
+                tvTopTitle!!.text = "Approval"
             }
             R.id.id_tab_frd -> {
                 mViewPager!!.currentItem = 1
                 mFrdImg!!.setImageResource(R.drawable.tab_02_pressed)
-                tvFrd!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //highlight the color of the font
-                tvTopTitle!!.text = "Sending Message"
+                tvFrd!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //并将字体颜色点亮
+                tvTopTitle!!.text = "Message"
             }
             R.id.id_tab_setting -> {
                 mViewPager!!.currentItem = 3
                 mSettingImg!!.setImageResource(R.drawable.tab_03_pressed)
-                tvSetting!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //highlight the color of the font
-                tvTopTitle!!.text = "Resolve Issue"
+                tvSetting!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //并将字体颜色点亮
+                tvTopTitle!!.text = "Resolve"
             }
+            R.id.l_msg_send -> startActivity(Intent(this, SendMsgActivity::class.java))
+            R.id.l_msg_rec -> startActivity(Intent(this, RecMsgActivity::class.java))
             else -> {}
         }
     }
 
-    /*
-	 * set all images to dark
-	 * */
     private fun resetImg() {
         mWeixinImg!!.setImageResource(R.drawable.tab_01_normal)
         mFrdImg!!.setImageResource(R.drawable.tab_02_normal)
@@ -211,35 +247,22 @@ class HomeActivity : Activity(), View.OnClickListener {
         tvSetting!!.setTextColor(resources.getColor(R.color.black))
     }
 
-    //call this function when a return value exists, determine who it belongs to by requestCode
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        when (requestCode) {
-            REQUEST_CODE_1 -> if (resultCode == RESULT_OK) {
-                //get return value
-                val rtn1 = data.getStringExtra("result")
-                Log.e("xxx", "return str:" + rtn1 + rtn1!!.length)
-                if (rtn1.length == 0) {
-                    Toast.makeText(mContext, "add items:0", Toast.LENGTH_SHORT).show()
-                } else {
-                    val arr = rtn1.split("\n").toTypedArray()
-                    loanItems = arr.size
-                    Toast.makeText(mContext, "add items:$loanItems", Toast.LENGTH_SHORT).show()
-                    tvInput!!.text = rtn1
-                }
-            }
-            REQUEST_CODE_2 -> if (resultCode == RESULT_OK) {
-                initData()
-            }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    //      * get the current date time
     private val currentDateTime: String
         private get() {
             val format = SimpleDateFormat("MMM d yyyy")
             return format.format(Date())
         }
+
+    override fun onItemClick(parent: AdapterView<*>, view: View, position: Int, id: Long) {
+        val ratingData = parent.adapter.getItem(position) as RatingData
+        AlertDialog.Builder(this).setIcon(R.mipmap.ic_launcher).setTitle("Delete")
+            .setMessage("delete this Rating ?").setPositiveButton("yes") { dialogInterface, i ->
+                mDataManager!!.deleteUserData(ratingData.id)
+                initData()
+                Toast.makeText(applicationContext, "delete Successfully!", Toast.LENGTH_SHORT)
+                    .show()
+            }.setNegativeButton("no", null).show()
+    }
 
     companion object {
         const val RESULT_OK = 0

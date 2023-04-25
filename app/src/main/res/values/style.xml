@@ -38,4 +38,33 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
     </style>
+
+    <!--灰色8a8a8a18号字体，130宽，主要用于确认个人信息表格样式-->
+    <style name="style_table_gray6_18_130_text">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/text10</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">@dimen/text10</item>
+    </style>
+
+
+
+    <!--黑色1c1c1c18号字体-->
+    <style name="style_table_black1_18_text">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/text10</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:padding">@dimen/text10</item>
+    </style>
+    <style name="mRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/ratingbar</item>
+        <item name="android:minHeight">38dp</item>
+        <item name="android:maxHeight">38dp</item>
+    </style>
 </resources>

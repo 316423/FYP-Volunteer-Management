@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="New Loan"/>
+            android:text="Approval"/>
     </LinearLayout>
     <LinearLayout 
         android:id="@+id/id_tab_frd"
@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="My Loans"/>
+            android:text="Message"/>
     </LinearLayout>
     <LinearLayout 
         android:id="@+id/id_tab_setting"
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="Manager"/>
+            android:text="Resolve"/>
     </LinearLayout>
 
 </LinearLayout>

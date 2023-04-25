@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.demo.PocketStore">
+    <!-- 基础模块START -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 基础模块 END -->
 
     <application
         android:allowBackup="true"
@@ -13,6 +21,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.VolunteerManagement"
         tools:targetApi="31">
+        <activity android:name="com.demo.PocketStore.EventDetialsActivity"></activity>
+        <activity android:name="com.demo.PocketStore.ShowReportActivity"></activity>
+        <activity android:name="com.demo.PocketStore.RatingActivity"></activity>
+        <activity android:name="com.demo.PocketStore.MyRatingActivity"></activity>
+        <activity android:name="com.demo.PocketStore.SendMsgActivity"></activity>
+        <activity android:name="com.demo.PocketStore.RecMsgActivity"></activity>
+        <activity android:name="com.demo.PocketStore.SendIssueActivity"></activity>
+        <activity android:name="com.demo.PocketStore.ResolveIssueActivity"></activity>
+
         <activity android:name="com.demo.PocketStore.AddEventActivity"></activity>
         <activity android:name="com.demo.PocketStore.MainActivity"></activity>
         <activity android:name="com.demo.PocketStore.SignupActivity"></activity>

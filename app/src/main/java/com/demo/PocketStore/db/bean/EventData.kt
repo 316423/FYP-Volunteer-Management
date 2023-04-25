@@ -1,25 +1,27 @@
-package com.demo.PocketStore
+package com.demo.PocketStore.db.bean
 
-class EventData {
-    @JvmField
+import java.io.Serializable
+
+
+class EventData : Serializable, Comparable<EventData> {
+    @kotlin.jvm.JvmField
     var id = 0
-    @JvmField
+    @kotlin.jvm.JvmField
     var title: String? = null
-    @JvmField
+    @kotlin.jvm.JvmField
     var description: String? = null
-    @JvmField
+    @kotlin.jvm.JvmField
     var date: String? = null
-    @JvmField
     var organisation_id = 0
-    @JvmField
+    @kotlin.jvm.JvmField
     var max_application = 0
-    @JvmField
+    @kotlin.jvm.JvmField
     var current_application = 0
-    @JvmField
+    @kotlin.jvm.JvmField
     var duration: String? = null
-    @JvmField
+    @kotlin.jvm.JvmField
     var location: String? = null
-    @JvmField
+    @kotlin.jvm.JvmField
     var skills_required: String? = null
 
     constructor() : super() {}
@@ -54,5 +56,9 @@ class EventData {
         this.duration = duration
         this.location = location
         this.skills_required = skills_required
+    }
+
+    override fun compareTo(data: EventData): Int {
+        return data.title!!.compareTo(title!!)
     }
 }

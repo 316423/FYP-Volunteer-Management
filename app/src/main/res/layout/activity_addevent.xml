@@ -82,12 +82,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
+        android:visibility="gone"
         android:text="current" />
     <EditText
         android:id="@+id/input_cur"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
+        android:visibility="gone"
         android:inputType="number"
         android:hint="please input" />
     <TextView

@@ -1,38 +1,42 @@
-package com.demo.PocketStore
+package com.demo.PocketStore.db.bean
+
 
 class UserData {
+    @kotlin.jvm.JvmField
 
-
-    //get username
-    var userName //username
+    var userName
             : String? = null
 
+    @kotlin.jvm.JvmField
 
-    var userEmail //email
+    var userEmail
+            : String? = null
+    @kotlin.jvm.JvmField
+
+
+    var userPhone
             : String? = null
 
+    @kotlin.jvm.JvmField
 
-    var userPhone //phone number
+    var userPwd
             : String? = null
 
-
-    var userPwd //password
-            : String? = null
-
+    @kotlin.jvm.JvmField
 
     var userStatus
             : String? = null
 
+    @kotlin.jvm.JvmField
 
     var userPro: String? = null
 
-    //config userid
-    //get userid
-    var userId //user ID
-            = 0
-    var pwdresetFlag = 0
+    @kotlin.jvm.JvmField
 
-    constructor(userName: String?, userPwd: String?) : super() {  //only username and password
+    var userId
+            = 0
+
+    constructor(userName: String?, userPwd: String?) : super() {
         this.userName = userName
         this.userPwd = userPwd
     }
@@ -42,17 +46,23 @@ class UserData {
         userPwd: String?,
         userEmail: String?,
         userPhone: String?
-    ) : super() {  //only username and password
+    ) : super() {  //这里只采用用户名和密码
         this.userName = userName
         this.userPwd = userPwd
         this.userEmail = userEmail
         this.userPhone = userPhone
     }
 
+    constructor(id: Int, userName: String?, userPwd: String?) : super() {  //这里只采用用户名和密码
+        userId = id
+        this.userName = userName
+        this.userPwd = userPwd
+    }
+
     constructor(
         id: Int, userName: String?, userEmail: String?, userPhone: String?,
         userPro: String?, userStatus: String?, userPwd: String?
-    ) : super() {  //only username and password
+    ) : super() {
         userId = id
         this.userName = userName
         this.userPwd = userPwd
@@ -62,6 +72,6 @@ class UserData {
         this.userPro = userPro
     }
 
-    constructor() : super() {  //only username and password
+    constructor() : super() {
     }
 }

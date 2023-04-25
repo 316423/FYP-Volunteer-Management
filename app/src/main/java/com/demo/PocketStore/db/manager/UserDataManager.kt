@@ -1,23 +1,39 @@
-package com.demo.PocketStore
+package com.demo.PocketStore.db.manager
 
-
-import android.database.sqlite.SQLiteDatabase
-import com.demo.PocketStore.UserDataManager.DataBaseManagementHelper
-import android.database.sqlite.SQLiteOpenHelper
-import com.demo.PocketStore.UserDataManager
-import android.util.Log
-import android.content.ContentValues
-import android.content.Context
-import kotlin.Throws
-import android.database.Cursor
-import android.database.SQLException
+import android.widget.BaseAdapter
+import android.widget.ListView
+import com.demo.PocketStore.db.manager.AppDataManager
+import com.demo.PocketStore.db.manager.VolDataManager
+import android.view.View
+import android.view.ViewGroup
+import android.view.LayoutInflater
+import com.demo.PocketStore.R
+import android.widget.TextView
+import android.widget.Toast
+import com.demo.PocketStore.db.manager.RatingDataManager
+import com.demo.PocketStore.db.manager.UserDataManager
+import android.widget.ImageView
+import android.widget.Button
+import com.demo.PocketStore.db.manager.IssueDataManager
 import java.util.ArrayList
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import kotlin.Throws
+import android.content.ContentValues
+import android.database.Cursor
+import android.content.Context
+import android.database.SQLException
+
+import com.demo.PocketStore.db.bean.*
+import java.util.Comparator
+import java.util.Collections
 
 class UserDataManager(context: Context?) {
     private var mContext: Context? = null
 
     enum class COL(val code: Int) {
-        id(0), nname(1), email(2), phone(3), pro(4), status(5), pwd(6);
+        id(0), names(1), email(2), phone(3), pro(4), status(5), pwd(6);
 
     }
 
@@ -25,8 +41,6 @@ class UserDataManager(context: Context?) {
     private var mSQLiteDatabase: SQLiteDatabase? = null
     private var mDatabaseHelper: DataBaseManagementHelper? = null
 
-    //  long i= insertUserData( manager_User);//insert amdmin
-    //DataBaseManagementHelper extend from SQLiteOpenHelper
     private class DataBaseManagementHelper internal constructor(context: Context?) :
         SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
         override fun onCreate(db: SQLiteDatabase) {
@@ -48,20 +62,19 @@ class UserDataManager(context: Context?) {
         }
     }
 
-    //open database
+    //open
     @Throws(SQLException::class)
     fun openDataBase() {
         mDatabaseHelper = DataBaseManagementHelper(mContext)
         mSQLiteDatabase = mDatabaseHelper!!.writableDatabase
     }
 
-    //close database
+    //close
     @Throws(SQLException::class)
     fun closeDataBase() {
         mDatabaseHelper!!.close()
     }
 
-    //add new user(sign up)
     fun insertUserData(userData: UserData): Long {
         val userName = userData.userName
         val userPwd = userData.userPwd
@@ -74,7 +87,6 @@ class UserDataManager(context: Context?) {
         return mSQLiteDatabase!!.insert(TABLE_NAME, ID, values)
     }
 
-    //update user data, eg change password
     fun updateUserData(userData: UserData): Boolean {
         //int id = userData.getUserId();
         val userName = userData.userName
@@ -116,7 +128,7 @@ class UserDataManager(context: Context?) {
                 userList.add(
                     UserData(
                         cursor.getInt(COL.id.code),
-                        cursor.getString(COL.nname.code),
+                        cursor.getString(COL.names.code),
                         cursor.getString(COL.email.code),
                         cursor.getString(COL.phone.code),
                         cursor.getString(COL.pro.code),
@@ -141,7 +153,7 @@ class UserDataManager(context: Context?) {
             userList.add(
                 UserData(
                     cursor.getInt(COL.id.code),
-                    cursor.getString(COL.nname.code),
+                    cursor.getString(COL.names.code),
                     cursor.getString(COL.email.code),
                     cursor.getString(COL.phone.code),
                     cursor.getString(COL.pro.code),
@@ -163,17 +175,14 @@ class UserDataManager(context: Context?) {
         return true
     }
 
-    //delete user by id
     fun deleteUserData(id: Int): Boolean {
         return mSQLiteDatabase!!.delete(TABLE_NAME, ID + "=" + id, null) > 0
     }
 
-    //delete user by name
     fun deleteUserDatabyname(name: String): Boolean {
         return mSQLiteDatabase!!.delete(TABLE_NAME, USER_NAME + "=" + name, null) > 0
     }
 
-    //delete all user
     fun deleteAllUserDatas(): Boolean {
         return mSQLiteDatabase!!.delete(TABLE_NAME, null, null) > 0
     }
@@ -181,10 +190,14 @@ class UserDataManager(context: Context?) {
     //
     fun getStringByColumnName(columnName: String?, id: Int): String {
         val mCursor = fetchUserData(id)
+        var columnValue = ""
         val columnIndex = mCursor!!.getColumnIndex(columnName)
-        val columnValue = mCursor.getString(columnIndex)
-        mCursor.close()
-        return columnValue
+        if (mCursor != null) {
+            columnValue = mCursor.getString(columnIndex)
+            mCursor.close()
+            return columnValue
+        }
+        return ""
     }
 
     //
@@ -197,19 +210,18 @@ class UserDataManager(context: Context?) {
         return mSQLiteDatabase!!.update(TABLE_NAME, values, ID + "=" + id, null) > 0
     }
 
-    fun updateUserDataById(userData: UserData, id: Int): Boolean {
+    fun updateUserDataById(userData: UserData?, id: Int): Boolean {
         val values = ContentValues()
-        values.put(ID, userData.userId)
-        values.put(USER_NAME, userData.userName)
-        values.put(USER_EMAIL, userData.userEmail)
-        values.put(USER_PHONE, userData.userPhone)
-        values.put(USER_STATUS, userData.userStatus)
-        values.put(USER_PRO, userData.userPro)
-        values.put(USER_PWD, userData.userPwd)
+        values.put(ID, userData?.userId)
+        values.put(USER_NAME, userData?.userName)
+        values.put(USER_EMAIL, userData?.userEmail)
+        values.put(USER_PHONE, userData?.userPhone)
+        values.put(USER_STATUS, userData?.userStatus)
+        values.put(USER_PRO, userData?.userPro)
+        values.put(USER_PWD, userData?.userPwd)
         return mSQLiteDatabase!!.update(TABLE_NAME, values, ID + "=" + id, null) > 0
     }
 
-    //find user by username, determine whether this username exists in database
     fun findUserByName(userName: String): Int {
         Log.v(TAG, "findUserByName , userName=$userName")
         val result = 0
@@ -223,7 +235,7 @@ class UserDataManager(context: Context?) {
             null
         )
         while (cur.moveToNext()) {
-            val user = cur.getString(COL.nname.code)
+            val user = cur.getString(COL.names.code)
             Log.v("db_query", user)
             if (user == userName) {
                 cur.close()
@@ -235,7 +247,6 @@ class UserDataManager(context: Context?) {
         return result
     }
 
-    //find user by username and password, for login
     fun findUserByNameAndPwd(userName: String, pwd: String): UserData? {
         Log.v(TAG, "findUserByNameAndPwd")
         var userData: UserData? = null
@@ -255,7 +266,7 @@ class UserDataManager(context: Context?) {
             if (pwd == userPwd) {
                 userData = UserData(
                     cur.getInt(COL.id.code),
-                    cur.getString(COL.nname.code),
+                    cur.getString(COL.names.code),
                     cur.getString(COL.email.code),
                     cur.getString(COL.phone.code),
                     cur.getString(COL.pro.code),
@@ -275,8 +286,6 @@ class UserDataManager(context: Context?) {
     }
 
     companion object {
-        //class for user data management
-        //global value and declaration
         private const val TAG = "UserDataManager"
         private const val DB_NAME = "Organisation"
         private const val TABLE_NAME = "users"
@@ -289,7 +298,7 @@ class UserDataManager(context: Context?) {
         const val USER_PWD = "password"
         private const val DB_VERSION = 2
 
-        //create table for user
+        //创建用户book表
         private const val DB_CREATE = ("CREATE TABLE " + TABLE_NAME + " ("
                 + ID + " integer primary key,"
                 + USER_NAME + " varchar,"
