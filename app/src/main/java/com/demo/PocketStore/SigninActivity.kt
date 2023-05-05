@@ -82,7 +82,7 @@ class SigninActivity : AppCompatActivity(), View.OnClickListener {
         initData()
         if (mUserDataManager == null) {
             mUserDataManager = UserDataManager(this)
-            mUserDataManager!!.openDataBase() //建立本地数据库
+            mUserDataManager!!.openDataBase()
         }
         //        if (eventDataManager==null){
 //            eventDataManager=new EventDataManager(this);
@@ -102,9 +102,7 @@ class SigninActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun initData() {
-        /**
-         * 动态获取权限，Android 6.0 新特性，一些保护权限，除了要在AndroidManifest中声明权限，还要使用如下代码动态获取
-         */
+
         if (Build.VERSION.SDK_INT >= 23) {
             val REQUEST_CODE_CONTACT = 101
             val permissions = arrayOf(
@@ -119,10 +117,9 @@ class SigninActivity : AppCompatActivity(), View.OnClickListener {
                 Manifest.permission.CAMERA,
                 Manifest.permission.READ_LOGS
             )
-            //验证是否许可权限
+
             for (str in permissions) {
                 if (checkSelfPermission(str) != PackageManager.PERMISSION_GRANTED) {
-                    //申请权限
                     requestPermissions(permissions, REQUEST_CODE_CONTACT)
                     return
                 }
@@ -130,16 +127,14 @@ class SigninActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * 登录方法
-     */
+
     fun login() {
-        //如果内容不合法，则直接返回，显示错误。
+
         if (!validate()) {
             Toast.makeText(applicationContext, "input is invalid", Toast.LENGTH_SHORT).show()
             return
         }
-        //获取输入内容
+
         val username = inputUsername!!.text.toString().trim { it <= ' ' }
         val password = inputPassword!!.text.toString().trim { it <= ' ' }
         if ("admin" == username && "123" == password) {
@@ -153,7 +148,7 @@ class SigninActivity : AppCompatActivity(), View.OnClickListener {
         }
         val userData = mUserDataManager!!.findUserByNameAndPwd(username, password)
         if (userData != null && "1" == userData.userStatus) {
-            //返回1说明用户名和密码均正确
+
             val intent = Intent(this, MainActivity::class.java)
             curUser = userData
             startActivity(intent)
@@ -172,33 +167,29 @@ class SigninActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * 重写返回键的返回方法
-     */
+
     override fun onBackPressed() {
         // Disable going back to the MainActivity
         moveTaskToBack(true)
     }
 
-    /**
-     * @return 判断是否账号密码是否合法
-     */
+
     fun validate(): Boolean {
-        //设置初值，默认为合法
+
         var valid = true
 
-        //获取输入内容
+
         val email = inputUsername!!.text.toString().trim { it <= ' ' }
         val password = inputPassword!!.text.toString().trim { it <= ' ' }
 
-        //判断账号
+
         if (email.isEmpty()) {
             inputUsername!!.error = "email is empty"
             valid = false
         } else {
             inputUsername!!.error = null
         }
-        //判断密码
+
         if (password.isEmpty()) {
             inputPassword!!.error = "password is empty"
             valid = false

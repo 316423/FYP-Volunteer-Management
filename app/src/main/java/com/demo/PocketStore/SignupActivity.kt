@@ -78,7 +78,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
     var _reEnterPasswordText: EditText? = null
     var _signupButton: AppCompatButton? = null
     var _linkSignin: TextView? = null
-    private var mUserDataManager //用户数据管理类
+    private var mUserDataManager
             : UserDataManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,7 +100,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     fun signup() {
-        //判断是否合法
+
         if (!validate()) {
             onSignupFailed(0)
             return
@@ -116,7 +116,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         val mUser = UserData(username, password, email, phone)
         if (mUserDataManager == null) {
             mUserDataManager = UserDataManager(this)
-            mUserDataManager!!.openDataBase() //建立本地数据库
+            mUserDataManager!!.openDataBase()
         }
         if (!mUserDataManager!!.checkUserDataValid(username, email)) {
             Toast.makeText(
@@ -125,7 +125,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
             ).show()
             return
         }
-        val flag = mUserDataManager!!.insertUserData(mUser) //注册用户信息
+        val flag = mUserDataManager!!.insertUserData(mUser)
         if (flag == -1L) {
             Toast.makeText(applicationContext, "register failed...", Toast.LENGTH_SHORT).show()
         } else {
@@ -134,7 +134,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
                 "register successfully,please login!",
                 Toast.LENGTH_SHORT
             ).show()
-            //Toast.makeText(getApplicationContext(),"文件保存成功", Toast.LENGTH_SHORT).show();
+
             val intent = Intent(this, SigninActivity::class.java)
             intent.putExtra("name", username)
             intent.putExtra("pwd", password)
@@ -143,10 +143,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    /**
-     * 注册失败，按钮置为可用
-     * 依据传参不同，进行不同吐司
-     */
+
     fun onSignupFailed(i: Int) {
         if (i == 1) {
             Toast.makeText(baseContext, "email is existed", Toast.LENGTH_LONG).show()
@@ -156,18 +153,16 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         _signupButton!!.isEnabled = true
     }
 
-    /**
-     * @return 输入内容是否合法
-     */
+
     fun validate(): Boolean {
         var valid = true
-        //      从控件中获取数据
+
         val name = _nameText!!.text.toString()
         val email = _nameText!!.text.toString()
         val phone = _passwordText!!.text.toString()
         val password = _passwordText!!.text.toString()
         val reEnterPassword = _reEnterPasswordText!!.text.toString()
-        //检测账号是否正确
+
         if (name.isEmpty()) {
             _nameText!!.error = "name is empty"
             valid = false
@@ -186,14 +181,14 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         } else {
             _phoneText!!.error = null
         }
-        //检测密码是否正确
+
         if (password.isEmpty()) {
             _passwordText!!.error = "password is empty"
             valid = false
         } else {
             _passwordText!!.error = null
         }
-        //检测重复密码是否正确
+
         if (reEnterPassword.isEmpty() || reEnterPassword != password) {
             _reEnterPasswordText!!.error = "password is different"
             valid = false
@@ -207,7 +202,7 @@ class SignupActivity : AppCompatActivity(), View.OnClickListener {
         when (view.id) {
             R.id.btn_signup -> signup()
             R.id.link_login -> {
-                //点击登录连接，跳转到登录页面
+
                 val intent = Intent(applicationContext, SigninActivity::class.java)
                 startActivity(intent)
                 finish()

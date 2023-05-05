@@ -115,9 +115,9 @@ class HomeActivity : Activity(), View.OnClickListener, OnItemClickListener {
         mTabWeixin!!.setOnClickListener(this)
         mTabFrd!!.setOnClickListener(this)
         mTabSetting!!.setOnClickListener(this)
-        //viewpager滑动事件
+
         mViewPager!!.setOnPageChangeListener(object : OnPageChangeListener {
-            override fun onPageSelected(arg0: Int) { //当viewpager滑动时，对应的底部导航按钮的图片要变化
+            override fun onPageSelected(arg0: Int) {
                 val currentItem = mViewPager!!.currentItem
                 resetImg()
                 when (currentItem) {
@@ -209,9 +209,9 @@ class HomeActivity : Activity(), View.OnClickListener, OnItemClickListener {
         list?.setOnItemClickListener(this)
         swipe = tab03.findViewById(R.id.swipe)
         swipe?.setColorSchemeColors(resources.getColor(R.color.red), resources.getColor(R.color.red))
-        //设置向下拉多少出现刷新
+
         swipe?.setDistanceToTriggerSync(200)
-        //设置刷新出现的位置
+
         swipe?.setProgressViewEndTarget(false, 200)
         swipe?.setOnRefreshListener(OnRefreshListener {
             swipe?.setRefreshing(false)
@@ -222,7 +222,7 @@ class HomeActivity : Activity(), View.OnClickListener, OnItemClickListener {
     private fun initData() {
         if (mUserDataManager == null) {
             mUserDataManager = UserDataManager(this)
-            mUserDataManager!!.openDataBase() //建立本地数据库
+            mUserDataManager!!.openDataBase()
         }
        // userDataList
         mUserDataManager!!.openDataBase()
@@ -251,20 +251,20 @@ class HomeActivity : Activity(), View.OnClickListener, OnItemClickListener {
         when (v.id) {
             R.id.id_tab_weixin -> {
                 mViewPager!!.currentItem = 0
-                mWeixinImg!!.setImageResource(R.drawable.tab_01_pressed) //并将按钮颜色点亮
-                tvWeixin!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //并将按钮颜色点亮
+                mWeixinImg!!.setImageResource(R.drawable.tab_01_pressed)
+                tvWeixin!!.setTextColor(resources.getColor(R.color.colorAccentBlue))
                 tvTopTitle!!.text = "Approval"
             }
             R.id.id_tab_frd -> {
                 mViewPager!!.currentItem = 1
                 mFrdImg!!.setImageResource(R.drawable.tab_02_pressed)
-                tvFrd!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //并将字体颜色点亮
+                tvFrd!!.setTextColor(resources.getColor(R.color.colorAccentBlue))
                 tvTopTitle!!.text = "Message"
             }
             R.id.id_tab_setting -> {
                 mViewPager!!.currentItem = 3
                 mSettingImg!!.setImageResource(R.drawable.tab_03_pressed)
-                tvSetting!!.setTextColor(resources.getColor(R.color.colorAccentBlue)) //并将字体颜色点亮
+                tvSetting!!.setTextColor(resources.getColor(R.color.colorAccentBlue))
                 tvTopTitle!!.text = "Resolve"
             }
             R.id.l_issue_send -> startActivity(Intent(this, ResolveIssueActivity::class.java))

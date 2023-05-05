@@ -152,7 +152,7 @@ class SendMsgActivity : AppCompatActivity(), View.OnClickListener {
                 position: Int,
                 id: Long
             ) {
-                // Toast.makeText(getApplication(), "点击了" + arr_adapter.getItem(position), Toast.LENGTH_SHORT).show();
+
                 selectSD1 = position
                 when (selectSD) {
                     1 -> rec_id = volDataList[position].id

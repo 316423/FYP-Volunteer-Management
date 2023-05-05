@@ -123,14 +123,14 @@ class RatingActivity : AppCompatActivity(), View.OnClickListener, OnItemClickLis
     }
 
     private fun initdata() {
-        //改变加载显示的颜色
+
         swipe!!.setColorSchemeColors(
             resources.getColor(R.color.red),
             resources.getColor(R.color.red)
         )
-        //设置向下拉多少出现刷新
+
         swipe!!.setDistanceToTriggerSync(200)
-        //设置刷新出现的位置
+
         swipe!!.setProgressViewEndTarget(false, 200)
         swipe!!.setOnRefreshListener {
             swipe!!.isRefreshing = false
